@@ -3,6 +3,7 @@
 ## Integrantes
 
 * Sheryl Astrid Murillo Duque
+* Mariana Andrea Escobar Bailarin
 
 ## Lenguaje
 
