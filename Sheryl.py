@@ -11,7 +11,7 @@ nltk.download('punkt')
 # Variable global
 ultimo_tree = None
 
-# ---------------- AST ---------------- #
+# ---------------- AST TEXTO ---------------- #
 def simplificar_ast(tree):
 
     if isinstance(tree, str):
@@ -20,6 +20,33 @@ def simplificar_ast(tree):
     hijos = [simplificar_ast(h) for h in tree]
 
     return f"{tree.label()}({', '.join(hijos)})"
+
+# ---------------- CONVERTIR AST A ÁRBOL ---------------- #
+def convertir_ast(tree):
+
+    if isinstance(tree, str):
+        return tree
+
+    hijos = []
+
+    for h in tree:
+
+        if isinstance(h, str):
+
+            # Ignorar paréntesis
+            if h not in ["(", ")"]:
+                hijos.append(h)
+
+        else:
+
+            hijos.append(
+                convertir_ast(h)
+            )
+
+    return nltk.Tree(
+        tree.label(),
+        hijos
+    )
 
 # ---------------- DERIVACIÓN ---------------- #
 def generar_derivacion(tree, modo="izquierda"):
@@ -103,44 +130,9 @@ def mostrar_ast():
 
     if ultimo_tree:
 
-        ventana_ast = tk.Toplevel()
+        ast = convertir_ast(ultimo_tree)
 
-        ventana_ast.title("AST")
-
-        ventana_ast.geometry("700x500")
-
-        ventana_ast.configure(bg="#1e1e2f")
-
-        titulo = tk.Label(
-            ventana_ast,
-            text="🧠 ÁRBOL SINTÁCTICO ABSTRACTO",
-            font=("Segoe UI", 20, "bold"),
-            bg="#1e1e2f",
-            fg="white"
-        )
-
-        titulo.pack(pady=20)
-
-        texto = tk.Text(
-            ventana_ast,
-            font=("Consolas", 14),
-            bg="#121220",
-            fg="white",
-            insertbackground="white",
-            bd=0
-        )
-
-        texto.pack(
-            expand=True,
-            fill="both",
-            padx=20,
-            pady=20
-        )
-
-        texto.insert(
-            tk.END,
-            simplificar_ast(ultimo_tree)
-        )
+        ast.draw()
 
     else:
 
@@ -163,7 +155,7 @@ def procesar():
             entry_expresion.get()
         )
 
-        # Gramática original
+        # Gramática
         grammar = CFG.fromstring("""
 
         E -> E '+' T
@@ -263,7 +255,7 @@ def procesar():
             "\n\n"
         )
 
-        # ---------------- AST ---------------- #
+        # ---------------- AST TEXTO ---------------- #
 
         resultado.insert(
             tk.END,
@@ -295,7 +287,7 @@ ventana.title(
     "Generador CFG PRO"
 )
 
-ventana.geometry("1000x850")
+ventana.geometry("800x550")
 
 ventana.configure(
     bg="#1e1e2f"
@@ -458,7 +450,7 @@ frame_botones.pack(
     pady=10
 )
 
-# Botón árbol
+# Botón árbol sintáctico
 btn_arbol = tk.Button(
     frame_botones,
     text="🌳 Ver Árbol",
